@@ -9,7 +9,7 @@ use std::fs;
 use std::io::stdin;
 use std::io::Read;
 use std::path::Path;
-use std::process;
+use std::process::exit;
 use std::process::Command;
 use tempfile::NamedTempFile;
 use toml::Value;
@@ -91,9 +91,11 @@ fn main() {
 
         if answer == "yes" || answer == "y" || answer.is_empty() {
             generate_config();
+            println!("Re-run emu to send an email");
+            exit(0);
         } else {
             println!("Config file not generated. Exiting.");
-            process::exit(0);
+            exit(0);
         }
     }
 
