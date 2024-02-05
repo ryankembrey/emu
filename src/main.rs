@@ -1,33 +1,18 @@
+mod config;
+
+use config::UserDetails;
 use clap::{App, Arg};
-use std::path::Path;
+use dirs;
+use lettre::transport::smtp::authentication::Credentials;
+use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
 use std::io::stdin;
 use std::io::Read;
+use std::path::Path;
+use std::process;
 use std::process::Command;
 use tempfile::NamedTempFile;
 use toml::Value;
-use serde_derive::{Deserialize,Serialize};
-use lettre::transport::smtp::authentication::Credentials;
-use lettre::{Message, SmtpTransport, Transport};
-use dirs;
-use std::process;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct UserDetails {
-    password: String,
-    email: String,
-    host: String,
-}
-
-impl UserDetails {
-    fn from_toml(toml: &Value) -> Result<Self, &'static str> {
-        let details_table = toml["details"].as_table().ok_or("Invalid TOML structure")?;
-        let password = details_table["password"].as_str().ok_or("Missing or invalid password")?.to_string();
-        let email = details_table["email"].as_str().ok_or("Missing or invalid email")?.to_string();
-        let host = details_table["host"].as_str().ok_or("Missing or invalid host")?.to_string();
-        Ok(UserDetails { password, email, host })
-    }
-}
 
 fn get_user_input(prompt: &str) -> String {
     println!("{}", prompt);
@@ -38,17 +23,19 @@ fn get_user_input(prompt: &str) -> String {
 
 fn open_editor(file_path: &str) {
     let editor = std::env::var("EDITOR").unwrap_or(String::from("nano")); // Use nano if EDITOR is not set
-    Command::new(editor).arg(file_path).status().expect("Failed to open editor");
+    Command::new(editor)
+        .arg(file_path)
+        .status()
+        .expect("Failed to open editor");
 }
-
 
 fn config_file_exists() -> bool {
     let config_path = dirs::config_dir().map(|p| p.join("emu/config.toml"));
-    
+
     if let Some(path) = config_path {
         return Path::new(&path).exists();
     }
-    
+
     false
 }
 
@@ -59,16 +46,19 @@ fn generate_config() {
     let host = get_user_input("Enter your email host (e.g., smtp.gmail.com):");
 
     // Create UserDetails struct
-    let user_details = UserDetails { password, email, host };
+    let user_details = UserDetails {
+        password,
+        email,
+        host,
+    };
 
     // Create a TOML Value from UserDetails
-    let toml_value = toml::to_string(&user_details).expect("Failed to serialize UserDetails to TOML");
-
+    let toml_value =
+        toml::to_string(&user_details).expect("Failed to serialize UserDetails to TOML");
 
     // Create a TOML table with "details" key
     let mut toml_table = toml::value::Table::new();
     toml_table.insert("details".to_string(), toml::Value::String(toml_value));
-
 
     // Write the TOML table to a file
     let toml_string = toml::to_string(&toml_table).expect("Failed to serialize TOML table");
@@ -87,18 +77,17 @@ fn write_config_file(config: &str) {
     let mut file = File::create(&toml_config_path).expect("Failed to create config file");
 
     // Write the config to the file
-    file.write_all(config.as_bytes()).expect("Failed to write to config file");
+    file.write_all(config.as_bytes())
+        .expect("Failed to write to config file");
 }
 
-
-
 fn main() {
-    
-
     if config_file_exists() {
         // Config exists, continue with your program logic
     } else {
-        let answer = get_user_input("Config file does not exist. Generate config? (Y/n)").trim().to_lowercase();
+        let answer = get_user_input("Config file does not exist. Generate config? (Y/n)")
+            .trim()
+            .to_lowercase();
 
         if answer == "yes" || answer == "y" || answer.is_empty() {
             generate_config();
@@ -147,7 +136,10 @@ fn main() {
         .get_matches();
 
     if matches.is_present("recipient") {
-        let to_email = matches.value_of("recipient").unwrap_or_default().to_string();
+        let to_email = matches
+            .value_of("recipient")
+            .unwrap_or_default()
+            .to_string();
         let subject = matches.value_of("subject").unwrap_or_default().to_string();
 
         let body = if let Some(body_text) = matches.value_of("body") {
@@ -161,9 +153,11 @@ fn main() {
 
         // Continue with the rest of your code...
         let toml_config_path = dirs::config_dir().unwrap().join("emu/config.toml");
-        let toml_file_contents = fs::read_to_string(&toml_config_path).expect("Error reading TOML config file");
+        let toml_file_contents =
+            fs::read_to_string(&toml_config_path).expect("Error reading TOML config file");
         let toml: Value = toml::from_str(&toml_file_contents).expect("Error parsing TOML");
-        let my_details = UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
+        let my_details =
+            UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
 
         // Build the email message
         let email = Message::builder()
@@ -177,7 +171,10 @@ fn main() {
         let send_confirmation = get_user_input("Send the mail? (Y/n)");
         if send_confirmation.to_lowercase() == "y" {
             // Set up credentials
-            let creds: Credentials = Credentials::new(my_details.email.to_string(), my_details.password.to_string());
+            let creds: Credentials = Credentials::new(
+                my_details.email.to_string(),
+                my_details.password.to_string(),
+            );
 
             // Open a remote connection to Gmail
             let mailer: SmtpTransport = SmtpTransport::relay(&my_details.host)
@@ -206,19 +203,23 @@ fn main() {
 
         // Read the content of the temporary file for the email body
         let mut body = String::new();
-        temp_file.read_to_string(&mut body).expect("Failed to read temporary file");
+        temp_file
+            .read_to_string(&mut body)
+            .expect("Failed to read temporary file");
 
         // Specify your TOML file path
         let toml_config_path = dirs::config_dir().unwrap().join("emu/config.toml");
 
         // Read the TOML file contents
-        let toml_file_contents = fs::read_to_string(&toml_config_path).expect("Error reading TOML config file");
+        let toml_file_contents =
+            fs::read_to_string(&toml_config_path).expect("Error reading TOML config file");
 
         // Parse the TOML contents
         let toml: Value = toml::from_str(&toml_file_contents).expect("Error parsing TOML");
 
         // Create UserDetails from the parsed TOML
-        let my_details = UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
+        let my_details =
+            UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
 
         // Build the email message
         let email: Message = Message::builder()
@@ -232,7 +233,10 @@ fn main() {
         let send_confirmation = get_user_input("Send the mail? (Y/n)");
         if send_confirmation.to_lowercase() == "y" {
             // Set up credentials
-            let creds: Credentials = Credentials::new(my_details.email.to_string(), my_details.password.to_string());
+            let creds: Credentials = Credentials::new(
+                my_details.email.to_string(),
+                my_details.password.to_string(),
+            );
 
             // Open a remote connection to Gmail
             let mailer: SmtpTransport = SmtpTransport::relay(&my_details.host)
