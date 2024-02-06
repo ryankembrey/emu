@@ -1,7 +1,8 @@
+mod app;
 mod config;
 mod input;
 
-use clap::{App, Arg};
+use app::build_cli;
 use config::{config_file_exists, generate_config, UserDetails};
 use dirs;
 use input::{get_user_input, open_editor};
@@ -29,43 +30,7 @@ fn main() {
         }
     }
 
-    let matches = App::new("emu")
-        .version("0.1.0")
-        .about("Email Utitly: Send emails over CLI")
-        .after_help("If no arguments are provided, the program will prompt you for the required information.")
-        .arg(
-            Arg::with_name("recipient")
-                .short("r")
-                .long("recipient")
-                .takes_value(true)
-                .required(false)
-                .help("Recipient's email address"),
-        )
-        .arg(
-            Arg::with_name("subject")
-                .short("s")
-                .long("subject")
-                .takes_value(true)
-                .required(false)
-                .help("Email subject"),
-        )
-        .arg(
-            Arg::with_name("body")
-                .short("b")
-                .long("body")
-                .takes_value(true)
-                .conflicts_with("file")
-                .help("Email body text"),
-        )
-        .arg(
-            Arg::with_name("file")
-                .short("f")
-                .long("file")
-                .takes_value(true)
-                .conflicts_with("body")
-                .help("Path to a file containing the email body"),
-        )
-        .get_matches();
+    let matches = build_cli().get_matches();
 
     if matches.is_present("recipient") {
         let to_email = matches
