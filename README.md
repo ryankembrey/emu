@@ -23,6 +23,8 @@ Copy the binary to a directory in your `$PATH`. For example:
 cp ./target/release/emu ~/.local/bin/emu
 ```
 
+Alternatively, downlaod the binary from the [releases page](https://github.com/ryankembrey/emu/releases).
+
 ## Usage
 To use `emu`, simply run 
 ```bash
@@ -34,7 +36,7 @@ The first time `emu` is run, the program will prompt you for details to enter in
 - Your password (use a app-specifc password for Gmail accounts)
 - The SMTP host (default is for Gmail)
 
-`emu` consists of two modes: prompt-mode and command-mode. If `emu` is run with no arguments, this will enter the program for prompt mode, meaning it will ask for the fields it needs. If arguments are provided, `emu` will enter command-mode in which it needs three arguments.
+`emu` consists of two modes: prompt-mode and command-mode. If `emu` is run with no arguments, this will enter the program into prompt mode, meaning it will ask for the fields it needs. If arguments are provided, `emu` will enter command-mode in which it needs three arguments.
 ```bash
 emu --recipient <RECIPIENT> --subject <SUBJECT> --body <BODY>
 ```
