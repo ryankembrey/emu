@@ -1,10 +1,10 @@
 mod config;
 mod input;
 
-use input::get_user_input;
-use config::UserDetails;
 use clap::{App, Arg};
+use config::UserDetails;
 use dirs;
+use input::get_user_input;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
@@ -14,8 +14,6 @@ use std::process::exit;
 use std::process::Command;
 use tempfile::NamedTempFile;
 use toml::Value;
-
-
 
 fn open_editor(file_path: &str) {
     let editor = std::env::var("EDITOR").unwrap_or(String::from("nano"));
