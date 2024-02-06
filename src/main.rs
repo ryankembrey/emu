@@ -58,6 +58,8 @@ fn generate_config() {
     write_config_file(&toml_string);
 
     println!("Config file generated successfully!");
+    println!("Re-run emu to send an email");
+    exit(0);
 }
 fn write_config_file(config: &str) {
     use std::fs::File;
@@ -84,8 +86,6 @@ fn main() {
 
         if answer == "yes" || answer == "y" || answer.is_empty() {
             generate_config();
-            println!("Re-run emu to send an email");
-            exit(0);
         } else {
             println!("Config file not generated. Exiting.");
             exit(0);
