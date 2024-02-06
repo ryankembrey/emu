@@ -1,5 +1,5 @@
 # emu
-`emu` (Email Utitlity) is a straightforward Command-Line Interface (CLI) program designed to simplify the process of sending emails from your terminal. It has been designed with 
+`emu` (Email Utility) is a straightforward Command-Line Interface (CLI) program designed to simplify the process of sending emails from your terminal. It has been designed with 
 the intent of being used in automated shell scripts.
 ## Features
 - Send emails through a CLI Interface
