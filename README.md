@@ -4,4 +4,3 @@
 
 ## Todo
 - [x] Add config generation
-- [ ] Clean codebase
