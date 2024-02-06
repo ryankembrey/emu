@@ -22,7 +22,7 @@ fn get_user_input(prompt: &str) -> String {
 }
 
 fn open_editor(file_path: &str) {
-    let editor = std::env::var("EDITOR").unwrap_or(String::from("nano")); // Use nano if EDITOR is not set
+    let editor = std::env::var("EDITOR").unwrap_or(String::from("nano"));
     Command::new(editor)
         .arg(file_path)
         .status()
@@ -45,7 +45,6 @@ fn generate_config() {
     let email = get_user_input("Enter your email address:");
     let host = get_user_input("Enter your email host (e.g., smtp.gmail.com):");
 
-    // Create UserDetails struct
     let user_details = UserDetails {
         password,
         email,
@@ -83,7 +82,7 @@ fn write_config_file(config: &str) {
 
 fn main() {
     if config_file_exists() {
-        // Config exists, continue with your program logic
+        // Config exists
     } else {
         let answer = get_user_input("Config file does not exist. Generate config? (Y/n)")
             .trim()
@@ -153,7 +152,6 @@ fn main() {
             get_user_input("Enter the email body:")
         };
 
-        // Continue with the rest of your code...
         let toml_config_path = dirs::config_dir().unwrap().join("emu/config.toml");
         let toml_file_contents =
             fs::read_to_string(&toml_config_path).expect("Error reading TOML config file");
@@ -169,7 +167,7 @@ fn main() {
             .body(body)
             .unwrap();
 
-        // Prompt the user before sending the email
+        // Sending confirmation
         let send_confirmation = get_user_input("Send the mail? (Y/n)");
         if send_confirmation.to_lowercase() == "y" {
             // Set up credentials
@@ -184,7 +182,7 @@ fn main() {
                 .credentials(creds)
                 .build();
 
-            // Send the email with enhanced error handling
+            // Send email
             if let Err(e) = mailer.send(&email) {
                 eprintln!("Error sending email: {:?}", e);
             } else {
@@ -200,10 +198,10 @@ fn main() {
         // Create a temporary file
         let mut temp_file = NamedTempFile::new().expect("Failed to create temporary file");
 
-        // Open the file with the user's preferred text editor
+        // Open the file
         open_editor(temp_file.path().to_str().unwrap());
 
-        // Read the content of the temporary file for the email body
+        // Read the content of the temporary file
         let mut body = String::new();
         temp_file
             .read_to_string(&mut body)
@@ -231,7 +229,7 @@ fn main() {
             .body(body)
             .unwrap();
 
-        // Prompt the user before sending the email
+        // Sending conirmation
         let send_confirmation = get_user_input("Send the mail? (Y/n)");
         if send_confirmation.to_lowercase() == "y" {
             // Set up credentials
@@ -246,7 +244,7 @@ fn main() {
                 .credentials(creds)
                 .build();
 
-            // Send the email with enhanced error handling
+            // Send the email
             if let Err(e) = mailer.send(&email) {
                 eprintln!("Error sending email: {:?}", e);
             } else {
