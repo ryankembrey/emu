@@ -8,3 +8,4 @@
 - [ ] Add support for more email providers
 - [ ] Add reply support
 - [ ] Add email queue
+- [ ] Add read from file mode
