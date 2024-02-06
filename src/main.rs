@@ -4,23 +4,14 @@ mod input;
 use clap::{App, Arg};
 use config::{config_file_exists, generate_config, UserDetails};
 use dirs;
-use input::get_user_input;
+use input::{get_user_input, open_editor};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
 use std::io::Read;
 use std::process::exit;
-use std::process::Command;
 use tempfile::NamedTempFile;
 use toml::Value;
-
-fn open_editor(file_path: &str) {
-    let editor = std::env::var("EDITOR").unwrap_or(String::from("nano"));
-    Command::new(editor)
-        .arg(file_path)
-        .status()
-        .expect("Failed to open editor");
-}
 
 fn main() {
     if config_file_exists() {
