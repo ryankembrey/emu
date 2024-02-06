@@ -2,7 +2,7 @@ use clap::{App, Arg};
 
 pub fn build_cli() -> clap::App<'static, 'static> {
     App::new("emu")
-        .version("0.1.0")
+        .version("0.2.0")
         .about("Email Utility: Send emails over CLI")
         .after_help("If no arguments are provided, the program will prompt you for the required information.")
         .arg(
