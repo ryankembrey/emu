@@ -65,7 +65,7 @@ fn main() {
 
         // Sending confirmation
         let send_confirmation = get_user_input("Send the mail? (Y/n)");
-        if send_confirmation.to_lowercase() == "y" {
+        if send_confirmation.to_lowercase() == "y" || send_confirmation.is_empty() {
             // Set up credentials
             let creds: Credentials = Credentials::new(
                 my_details.email.to_string(),
