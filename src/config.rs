@@ -13,16 +13,15 @@ pub struct UserDetails {
 
 impl UserDetails {
     pub fn from_toml(toml: &Value) -> Result<Self, &'static str> {
-        let details_table = toml["details"].as_table().ok_or("Invalid TOML structure")?;
-        let password = details_table["password"]
+        let password = toml["password"]
             .as_str()
             .ok_or("Missing or invalid password")?
             .to_string();
-        let email = details_table["email"]
+        let email = toml["email"]
             .as_str()
             .ok_or("Missing or invalid email")?
             .to_string();
-        let host = details_table["host"]
+        let host = toml["host"]
             .as_str()
             .ok_or("Missing or invalid host")?
             .to_string();
@@ -46,8 +45,8 @@ fn config_file_exists() -> bool {
 
 fn generate_config() {
     // Prompt the user for details
-    let password = get_user_input("Enter your email password:");
     let email = get_user_input("Enter your email address:");
+    let password = get_user_input("Enter your email password:");
     let host = get_user_input("Enter your email host (e.g., smtp.gmail.com):");
 
     let user_details = UserDetails {
@@ -56,36 +55,24 @@ fn generate_config() {
         host,
     };
 
-    // Create a TOML Value from UserDetails
-    let toml_value =
-        toml::to_string(&user_details).expect("Failed to serialize UserDetails to TOML");
+    // Specify your TOML file path
+    let config_dir = dirs::config_dir().unwrap().join("emu");
+    let toml_config_path = config_dir.join("config.toml");
 
-    // Create a TOML table with "details" key
-    let mut toml_table = toml::value::Table::new();
-    toml_table.insert("details".to_string(), toml::Value::String(toml_value));
+    // Create the emu folder if it doesn't exist
+    if !config_dir.exists() {
+        std::fs::create_dir_all(&config_dir).expect("Failed to create emu folder");
+    }
 
-    // Write the TOML table to a file
-    let toml_string = toml::to_string(&toml_table).expect("Failed to serialize TOML table");
-    write_config_file(&toml_string);
+    // Serialize UserDetails directly to TOML
+    let toml_string = toml::to_string_pretty(&user_details).expect("Failed to serialize to TOML");
+
+    // Write the config to the file
+    std::fs::write(&toml_config_path, toml_string).expect("Failed to write to config file");
 
     println!("Config file generated successfully!");
     println!("Re-run emu to send an email");
     exit(0);
-}
-
-fn write_config_file(config: &str) {
-    use std::fs::File;
-    use std::io::Write;
-
-    // Specify your TOML file path
-    let toml_config_path = dirs::config_dir().unwrap().join("emu/config.toml");
-
-    // Create the config file
-    let mut file = File::create(&toml_config_path).expect("Failed to create config file");
-
-    // Write the config to the file
-    file.write_all(config.as_bytes())
-        .expect("Failed to write to config file");
 }
 
 pub fn handle_config() {
