@@ -47,7 +47,10 @@ fn generate_config() {
     // Prompt the user for details
     let email = get_user_input("Enter your email address:");
     let password = get_user_input("Enter your email password:");
-    let host = get_user_input("Enter your email host (e.g., smtp.gmail.com):");
+    let mut host = get_user_input("Enter your email host (default: smtp.gmail.com):");
+    if host.trim().is_empty() {
+        host = String::from("smpt.gmail.com");
+    }
 
     let user_details = UserDetails {
         password,
