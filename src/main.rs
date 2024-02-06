@@ -2,7 +2,7 @@ mod config;
 mod input;
 
 use clap::{App, Arg};
-use config::{config_file_exists, UserDetails};
+use config::{config_file_exists, generate_config, UserDetails};
 use dirs;
 use input::get_user_input;
 use lettre::transport::smtp::authentication::Credentials;
@@ -20,49 +20,6 @@ fn open_editor(file_path: &str) {
         .arg(file_path)
         .status()
         .expect("Failed to open editor");
-}
-
-fn generate_config() {
-    // Prompt the user for details
-    let password = get_user_input("Enter your email password:");
-    let email = get_user_input("Enter your email address:");
-    let host = get_user_input("Enter your email host (e.g., smtp.gmail.com):");
-
-    let user_details = UserDetails {
-        password,
-        email,
-        host,
-    };
-
-    // Create a TOML Value from UserDetails
-    let toml_value =
-        toml::to_string(&user_details).expect("Failed to serialize UserDetails to TOML");
-
-    // Create a TOML table with "details" key
-    let mut toml_table = toml::value::Table::new();
-    toml_table.insert("details".to_string(), toml::Value::String(toml_value));
-
-    // Write the TOML table to a file
-    let toml_string = toml::to_string(&toml_table).expect("Failed to serialize TOML table");
-    write_config_file(&toml_string);
-
-    println!("Config file generated successfully!");
-    println!("Re-run emu to send an email");
-    exit(0);
-}
-fn write_config_file(config: &str) {
-    use std::fs::File;
-    use std::io::Write;
-
-    // Specify your TOML file path
-    let toml_config_path = dirs::config_dir().unwrap().join("emu/config.toml");
-
-    // Create the config file
-    let mut file = File::create(&toml_config_path).expect("Failed to create config file");
-
-    // Write the config to the file
-    file.write_all(config.as_bytes())
-        .expect("Failed to write to config file");
 }
 
 fn main() {
