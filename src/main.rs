@@ -1,18 +1,19 @@
 mod app;
 mod config;
+mod email;
 mod input;
 
 use app::build_cli;
 use config::{config_file_exists, generate_config, UserDetails};
 use dirs;
 use input::{get_user_input, open_editor};
-use lettre::transport::smtp::authentication::Credentials;
-use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
 use std::io::Read;
 use std::process::exit;
 use tempfile::NamedTempFile;
 use toml::Value;
+
+use self::email::send_email;
 
 fn main() {
     if config_file_exists() {
@@ -55,38 +56,8 @@ fn main() {
         let my_details =
             UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
 
-        // Build the email message
-        let email = Message::builder()
-            .from(my_details.email.parse().unwrap())
-            .to(to_email.parse().unwrap())
-            .subject(subject)
-            .body(body)
-            .unwrap();
-
-        // Sending confirmation
-        let send_confirmation = get_user_input("Send the mail? (Y/n)");
-        if send_confirmation.to_lowercase() == "y" || send_confirmation.is_empty() {
-            // Set up credentials
-            let creds: Credentials = Credentials::new(
-                my_details.email.to_string(),
-                my_details.password.to_string(),
-            );
-
-            // Open a remote connection to Gmail
-            let mailer: SmtpTransport = SmtpTransport::relay(&my_details.host)
-                .unwrap()
-                .credentials(creds)
-                .build();
-
-            // Send email
-            if let Err(e) = mailer.send(&email) {
-                eprintln!("Error sending email: {:?}", e);
-            } else {
-                println!("Email sent successfully!");
-            }
-        } else {
-            println!("Email not sent.");
-        }
+        // Use the function from the email module
+        email::send_email(my_details, &to_email, &subject, &body);
     } else {
         let to_email = get_user_input("Enter the email of the recipient:");
         let subject = get_user_input("Enter the subject of the email:");
@@ -117,37 +88,6 @@ fn main() {
         let my_details =
             UserDetails::from_toml(&toml).expect("Error creating UserDetails from TOML");
 
-        // Build the email message
-        let email: Message = Message::builder()
-            .from(my_details.email.parse().unwrap())
-            .to(to_email.parse().unwrap())
-            .subject(subject)
-            .body(body)
-            .unwrap();
-
-        // Sending conirmation
-        let send_confirmation = get_user_input("Send the mail? (Y/n)");
-        if send_confirmation.to_lowercase() == "y" {
-            // Set up credentials
-            let creds: Credentials = Credentials::new(
-                my_details.email.to_string(),
-                my_details.password.to_string(),
-            );
-
-            // Open a remote connection to Gmail
-            let mailer: SmtpTransport = SmtpTransport::relay(&my_details.host)
-                .unwrap()
-                .credentials(creds)
-                .build();
-
-            // Send the email
-            if let Err(e) = mailer.send(&email) {
-                eprintln!("Error sending email: {:?}", e);
-            } else {
-                println!("Email sent successfully!");
-            }
-        } else {
-            println!("Email not sent.");
-        }
+        send_email(my_details, &to_email, &subject, &body);
     }
 }
