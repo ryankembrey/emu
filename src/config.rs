@@ -34,7 +34,7 @@ impl UserDetails {
     }
 }
 
-pub fn config_file_exists() -> bool {
+fn config_file_exists() -> bool {
     let config_path = dirs::config_dir().map(|p| p.join("emu/config.toml"));
 
     if let Some(path) = config_path {
@@ -44,7 +44,7 @@ pub fn config_file_exists() -> bool {
     false
 }
 
-pub fn generate_config() {
+fn generate_config() {
     // Prompt the user for details
     let password = get_user_input("Enter your email password:");
     let email = get_user_input("Enter your email address:");
@@ -86,4 +86,21 @@ fn write_config_file(config: &str) {
     // Write the config to the file
     file.write_all(config.as_bytes())
         .expect("Failed to write to config file");
+}
+
+pub fn handle_config() {
+    if config_file_exists() {
+        // Config exists
+    } else {
+        let answer = get_user_input("Config file does not exist. Generate config? (Y/n)")
+            .trim()
+            .to_lowercase();
+
+        if answer == "yes" || answer == "y" || answer.is_empty() {
+            generate_config();
+        } else {
+            println!("Config file not generated. Exiting.");
+            exit(0);
+        }
+    }
 }

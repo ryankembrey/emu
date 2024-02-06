@@ -4,32 +4,18 @@ mod email;
 mod input;
 
 use app::build_cli;
-use config::{config_file_exists, generate_config, UserDetails};
+use config::{handle_config, UserDetails};
 use dirs;
 use input::{get_user_input, open_editor};
 use std::fs;
 use std::io::Read;
-use std::process::exit;
 use tempfile::NamedTempFile;
 use toml::Value;
 
 use self::email::send_email;
 
 fn main() {
-    if config_file_exists() {
-        // Config exists
-    } else {
-        let answer = get_user_input("Config file does not exist. Generate config? (Y/n)")
-            .trim()
-            .to_lowercase();
-
-        if answer == "yes" || answer == "y" || answer.is_empty() {
-            generate_config();
-        } else {
-            println!("Config file not generated. Exiting.");
-            exit(0);
-        }
-    }
+    handle_config();
 
     let matches = build_cli().get_matches();
 
