@@ -2,14 +2,13 @@ mod config;
 mod input;
 
 use clap::{App, Arg};
-use config::UserDetails;
+use config::{config_file_exists, UserDetails};
 use dirs;
 use input::get_user_input;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
 use std::io::Read;
-use std::path::Path;
 use std::process::exit;
 use std::process::Command;
 use tempfile::NamedTempFile;
@@ -21,16 +20,6 @@ fn open_editor(file_path: &str) {
         .arg(file_path)
         .status()
         .expect("Failed to open editor");
-}
-
-fn config_file_exists() -> bool {
-    let config_path = dirs::config_dir().map(|p| p.join("emu/config.toml"));
-
-    if let Some(path) = config_path {
-        return Path::new(&path).exists();
-    }
-
-    false
 }
 
 fn generate_config() {

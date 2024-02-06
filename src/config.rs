@@ -1,5 +1,6 @@
-use toml::Value;
 use serde_derive::{Deserialize, Serialize};
+use std::path::Path;
+use toml::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserDetails {
@@ -29,4 +30,14 @@ impl UserDetails {
             host,
         })
     }
+}
+
+pub fn config_file_exists() -> bool {
+    let config_path = dirs::config_dir().map(|p| p.join("emu/config.toml"));
+
+    if let Some(path) = config_path {
+        return Path::new(&path).exists();
+    }
+
+    false
 }
