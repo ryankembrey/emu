@@ -4,3 +4,7 @@
 
 ## Todo
 - [x] Add config generation
+- [ ] Add file attachment support
+- [ ] Add support for more email providers
+- [ ] Add reply support
+- [ ] Add email queue
