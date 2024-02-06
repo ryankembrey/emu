@@ -1,12 +1,13 @@
 mod config;
+mod input;
 
+use input::get_user_input;
 use config::UserDetails;
 use clap::{App, Arg};
 use dirs;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::fs;
-use std::io::stdin;
 use std::io::Read;
 use std::path::Path;
 use std::process::exit;
@@ -14,12 +15,7 @@ use std::process::Command;
 use tempfile::NamedTempFile;
 use toml::Value;
 
-fn get_user_input(prompt: &str) -> String {
-    println!("{}", prompt);
-    let mut input = String::new();
-    stdin().read_line(&mut input).expect("Failed to read input");
-    input.trim().to_string()
-}
+
 
 fn open_editor(file_path: &str) {
     let editor = std::env::var("EDITOR").unwrap_or(String::from("nano"));
