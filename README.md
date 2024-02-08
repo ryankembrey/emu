@@ -53,7 +53,7 @@ FLAGS:
 OPTIONS:
     -b, --body <body>               Email body text
     -f, --file <file>               Path to a file containing the email body
-    -r, --recipient <recipient>     Recipient's email address
+    -r, --recipient <recipient>     Recipient email address
     -s, --subject <subject>         Email subject
 ```
 ## Todo

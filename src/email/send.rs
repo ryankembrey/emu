@@ -1,5 +1,6 @@
 use crate::config::UserDetails;
 use crate::input::get_user_input;
+use lettre::message::Attachment;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 
@@ -14,7 +15,6 @@ pub fn send_email(user_details: UserDetails, to_email: &str, subject: &str, body
         .subject(subject)
         .body(body_string)
         .unwrap();
-
     // Sending confirmation
     let send_confirmation = get_user_input("Send the mail? (Y/n)");
     if send_confirmation.to_lowercase() == "y" || send_confirmation.is_empty() {
