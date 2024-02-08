@@ -1,6 +1,5 @@
 use crate::config::UserDetails;
 use crate::input::get_user_input;
-use lettre::message::Attachment;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 
